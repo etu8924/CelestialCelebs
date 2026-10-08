@@ -4,7 +4,6 @@ import requests
 import pandas as pd
 import time
 
-
 def pytrends_query(keywords, anchor, timeframe='2020-01-01 2026-09-30', pause=5):
     '''
     Returns a list of daily search interest for each keyword in the list of 'keywords' between 'start_date' and 'end_date'.
@@ -61,3 +60,13 @@ if __name__ == "__main__":
     print(output)
     df = pytrends_query(["Einstein", "Newton", "Galilei", "Kepler", "Copernicus", "Bohr", "Hubble", "Curie", "Turing"], anchor='Kepler')
     print(df)
+
+'''
+To import: 
+import sys
+from pathlib import Path
+current_dir = Path(__file__).resolve().parent
+parent_dir = current_dir.parent
+sys.path.append(str(parent_dir))
+from popularity_queryies import pytrends_query, wiki_pageviews
+'''
