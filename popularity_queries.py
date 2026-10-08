@@ -3,10 +3,12 @@ import requests
 
 import pandas as pd
 import time
+from datetime import date, datetime, timedelta
+
 
 def pytrends_query(keywords, anchor, timeframe='2020-01-01 2026-09-30', pause=5):
     '''
-    Returns a list of daily search interest for each keyword in the list of 'keywords' between 'start_date' and 'end_date'.
+    Returns a list of monthly search interest for each keyword in the list of 'keywords' between 'start_date' and 'end_date'.
     Need to decide an 'anchor' that will be the point of reference for each batch of keywords. 
     The anchor should be a keyword that is expected to have a relatively stable search interest over time, so that it can be used to normalize the search interest of the other keywords in the batch.
 
@@ -35,13 +37,14 @@ def pytrends_query(keywords, anchor, timeframe='2020-01-01 2026-09-30', pause=5)
     return combined / combined.max().max() * 100
 
 
-def wiki_pageviews(article_titles, start_date="20200101", end_date='20260930'):
+def wiki_pageviews(article_titles, start_date="2020010100", end_date='2026093000'):
     '''
     Returns a list of daily page views for each article title in the list of 'article_titles' between 'start_date' and 'end_date'.
 
-    Make sure to use the correct format for the dates (YYYYMMDD) and article titles (replace spaces with underscores).
+    Make sure to use the correct format for the dates (YYYYMMDDHH) and article titles (replace spaces with underscores).
     '''
-    output = {article_title: [] for article_title in article_titles}
+    formatted_dates = [(datetime.strptime(start_date, "%Y%m%d%H") + timedelta(days=x)).strftime("%Y%m%d%H") for x in range((datetime.strptime(end_date, "%Y%m%d%H") - datetime.strptime(start_date, "%Y%m%d%H")).days + 1)]
+    output = {article_title: {date: 0 for date in formatted_dates} for article_title in article_titles}
 
     for article_title in article_titles:
         url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{article_title}/daily/{start_date}/{end_date}'
@@ -51,12 +54,13 @@ def wiki_pageviews(article_titles, start_date="20200101", end_date='20260930'):
         if resp.status_code == 404:
             # Either wikimedia api can't find it (check spelling!), hasn't updated, or page has 0 views. Probably won't encounter case that API isn't updated, so just leave as 0 views.
             output[article_title] = 0
-        output[article_title] = [item['views'] for item in data.get('items', [])]
+        for item in data.get('items', []):
+            output[article_title][item['timestamp']] = item['views']
     return pd.DataFrame(output)
 
 
 if __name__ == "__main__":
-    output = wiki_pageviews(["Albert_Einstein", "Isaac_Newton"], start_date="20260901")
+    output = wiki_pageviews(["Albert_Einstein", "Isaac_Newton", "newton"], start_date="2026090100")
     print(output)
     df = pytrends_query(["Einstein", "Newton", "Galilei", "Kepler", "Copernicus", "Bohr", "Hubble", "Curie", "Turing"], anchor='Kepler')
     print(df)
@@ -68,5 +72,5 @@ from pathlib import Path
 current_dir = Path(__file__).resolve().parent
 parent_dir = current_dir.parent
 sys.path.append(str(parent_dir))
-from popularity_queryies import pytrends_query, wiki_pageviews
+from popularity_queries import pytrends_query, wiki_pageviews
 '''
