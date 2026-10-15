@@ -1,9 +1,12 @@
+from urllib import response
+
 from pytrends.request import TrendReq
 import requests
 
 import pandas as pd
 import time
 from datetime import date, datetime, timedelta
+import io
 
 
 def pytrends_query(keywords, anchor, timeframe='2020-01-01 2026-09-30', pause=5):
@@ -59,11 +62,28 @@ def wiki_pageviews(article_titles, start_date="2020010100", end_date='2026093000
     return pd.DataFrame(output)
 
 
+def wiki_scrape(url, col_inds, table_ind=0):
+    '''
+    Scrapes a Wikipedia page and returns a DataFrame with the specified columns. The values are (name, link)
+
+    col_inds: the indices of the columns to extract from the table
+    table_ind: the index of the table to extract from the page (may have to play around w this number to get the right table)
+    '''
+    headers = {'User-Agent': 'WikiTableScraper/1.0 (https://github.com/etu8924/CelestialCelebs)'}
+    response = requests.get(url, headers=headers)
+    html_io = io.StringIO(response.text)
+    tables = pd.read_html(html_io, extract_links='body')
+    df = tables[table_ind]
+    return df.iloc[:, col_inds]
+
+
 if __name__ == "__main__":
-    output = wiki_pageviews(["Albert_Einstein", "Isaac_Newton", "newton"], start_date="2026090100")
-    print(output)
-    df = pytrends_query(["Einstein", "Newton", "Galilei", "Kepler", "Copernicus", "Bohr", "Hubble", "Curie", "Turing"], anchor='Kepler')
-    print(df)
+    # output = wiki_pageviews(["Albert_Einstein", "Isaac_Newton", "newton"], start_date="2026090100")
+    # print(output)
+    # df = pytrends_query(["Einstein", "Newton", "Galilei", "Kepler", "Copernicus", "Bohr", "Hubble", "Curie", "Turing"], anchor='Kepler')
+    # print(df)
+    print(wiki_scrape("https://en.wikipedia.org/wiki/List_of_galaxies", [1], 2))
+    print(wiki_scrape("https://en.wikipedia.org/wiki/List_of_planetary_nebulae", [1, 2, 3, 4]))
 
 '''
 To import: 
