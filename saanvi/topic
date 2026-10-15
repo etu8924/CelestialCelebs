@@ -1,0 +1,4 @@
+Question: Which physical characteristic of a galaxy, distance from Earth, brightness, or physical size, has the strongest relationship with public popularity?
+
+Regression: Popularity = B0+B1(Distance)+B2(Brightness)+B3(Size)
+The question underlying here is that if two galaxies have the same brightness and size, does distance explain why one is more popular?
