@@ -87,10 +87,17 @@ if __name__ == "__main__":
 
 '''
 To import: 
+
+# method 1
 import sys
 from pathlib import Path
-current_dir = Path(__file__).resolve().parent
-parent_dir = current_dir.parent
-sys.path.append(str(parent_dir))
+parent_dir = str(Path().resolve().parent)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+import popularity_queries
+
+# method 2
+import sys
+sys.path.insert(0, '..')
 from popularity_queries import pytrends_query, wiki_pageviews
 '''
