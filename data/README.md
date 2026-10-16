@@ -21,3 +21,15 @@ cols:
 - main_id: SIMBAD ID
 - ra: right ascension (in WCS) of star
 - dec: declination (in WCS) of star
+
+## `nebulae_data.csv`
+
+cols:
+
+- img: link to wikipedia-hosted image of the nebula
+- name: common name of the nebula, if it exists
+- messier: messier designation 
+- ngc: ngc designation
+- other: other designations (if applicable)
+- designation: most widely acknowledged designation
+- 
