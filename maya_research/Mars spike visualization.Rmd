@@ -1,0 +1,59 @@
+---
+title: "mars spike visualization"
+author: "Maya Dixit"
+date: "2026-10-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+```
+#visualizing the data & the spike
+```{r}
+setwd("C:/Users/mayad/OneDrive/Documents/GitHub/CelestialCelebs/maya_research")
+mars <- read_csv("mars_daily_views.csv")
+spikes <- read_csv("mars_spikes.csv")
+
+```
+
+
+```{r, fig.wdith=10, fig.height=5}
+ggplot(mars, aes(x=date, y=views)) + geom_rect(data=spikes,
+                                                aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf),
+                                                inherit.aes=FALSE, fill = "blue", alpha=.2) +
+  geom_line(color="purple", linewidth=.4)+ geom_point(data=spikes,aes(x=date,y=views), color="red",size=3)+
+  geom_text(data = spikes, aes(x = date, y = views),
+            label = str_wrap("NASA's Perseverance rover completes its first 10 days on Mars", width = 30),
+            hjust=-.1, vjust = 1, size = 3.5) +
+  scale_y_continuous(labels=scales::comma,
+                     expand=expansion(mult=c(.05,.2))) + labs(title="Daily Wikipedia views for Mars", x="date", y="views per day")
+
+
+spikes
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,9 @@
 from urllib import response
+from collections import Counter
 
-from pytrends.request import TrendReq
+counter = Counter()
+
+# from pytrends.request import TrendReq
 import requests
 
 import pandas as pd
@@ -46,10 +49,11 @@ def wiki_pageviews(article_titles, start_date="2020010100", end_date='2026093000
 
     Make sure to use the correct format for the dates (YYYYMMDDHH) and article titles (replace spaces with underscores).
     '''
+    counter = Counter()
     formatted_dates = [(datetime.strptime(start_date, "%Y%m%d%H") + timedelta(days=x)).strftime("%Y%m%d%H") for x in range((datetime.strptime(end_date, "%Y%m%d%H") - datetime.strptime(start_date, "%Y%m%d%H")).days + 1)]
     output = {article_title: {date: 0 for date in formatted_dates} for article_title in article_titles}
 
-    for article_title in article_titles:
+    for i, article_title in enumerate(article_titles):
         url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{article_title}/daily/{start_date}/{end_date}'
         headers = {'User-Agent': 'WikiDataScraper/1.0 (https://github.com/etu8924/CelestialCelebs)'}
         resp = requests.get(url, headers=headers)
@@ -59,6 +63,9 @@ def wiki_pageviews(article_titles, start_date="2020010100", end_date='2026093000
             output[article_title] = 0
         for item in data.get('items', []):
             output[article_title][item['timestamp']] = item['views']
+        counter["count"] = i
+        print(f"\rCurrent article: {i}", end="", flush=True)
+    print()
     return pd.DataFrame(output)
 
 
@@ -77,13 +84,24 @@ def wiki_scrape(url, col_inds, table_ind=0):
     return df.iloc[:, col_inds]
 
 
+
 if __name__ == "__main__":
     # output = wiki_pageviews(["Albert_Einstein", "Isaac_Newton", "newton"], start_date="2026090100")
     # print(output)
     # df = pytrends_query(["Einstein", "Newton", "Galilei", "Kepler", "Copernicus", "Bohr", "Hubble", "Curie", "Turing"], anchor='Kepler')
     # print(df)
-    print(wiki_scrape("https://en.wikipedia.org/wiki/List_of_galaxies", [1], 2))
-    print(wiki_scrape("https://en.wikipedia.org/wiki/List_of_planetary_nebulae", [1, 2, 3, 4]))
+    # print(wiki_scrape("https://en.wikipedia.org/wiki/List_of_galaxies", [1], 2))
+    # print(wiki_scrape("https://en.wikipedia.org/wiki/List_of_planetary_nebulae", [1, 2, 3, 4]))
+    def parse(data):
+        return pd.read_csv(f"data/{data}.csv")['0'].apply(lambda x: x.split('\'')[-2].split("wiki/")[-1].split("_")).apply(lambda x: " ".join(x)).to_list()
+    # stars, galaxies, exoplanets, asteroids
+    stars = parse("stars_list")
+    galaxies = parse("galaxies_list")
+    exoplanets = parse("exoplanet_list")
+    nebulas = parse("nebula_list")
+    asteroids = parse("asteroids_list")
+    everything = stars + galaxies + exoplanets + nebulas + asteroids
+    everything_pv = wiki_pageviews(everything)
 
 '''
 To import: 
