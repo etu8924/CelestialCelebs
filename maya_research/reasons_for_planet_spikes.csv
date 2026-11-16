@@ -1,2 +1,4 @@
 planet,start,end,date,views,normal,times_normal,recovered,spike_type,reason
-Mars,2021-02-24,2021-02-28,2021-02-26,201779,5402,17.8,False,Mission,NASA's Perseverance rover completes its first 10 days on Mars
+Mars,2015-09-27,2015-10-01,2015-09-29,264936,4966,22.4,False,Potential Life Signs,NASA finds evidences that there was once flowing liquid water on Mars
+Mars,2021-02-24,2021-02-28,2021-02-26,201779,4966,19.4,False,Mission,NASA's Perseverance rover completes its first 10 days on Mars
+Venus,2020-09-13,2020-09-17,2020-09-15,119224,4323,15.7,True,Potential Life Signs,NASA finds evidences of phosphine in the atmosphere of Venus which is a potential sign of life
