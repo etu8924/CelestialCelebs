@@ -23,23 +23,53 @@ spikes <- read_csv("mars_spikes.csv")
 ```
 
 
-```{r, fig.wdith=10, fig.height=5}
-ggplot(mars, aes(x=date, y=views)) + geom_rect(data=spikes,
-                                                aes(xmin=start, xmax=end, ymin=-Inf, ymax=Inf),
-                                                inherit.aes=FALSE, fill = "blue", alpha=.2) +
-  geom_line(color="purple", linewidth=.4)+ geom_point(data=spikes,aes(x=date,y=views), color="red",size=3)+
-  geom_text(data = spikes, aes(x = date, y = views),
-            label = str_wrap("NASA's Perseverance rover completes its first 10 days on Mars", width = 30),
-            hjust=-.1, vjust = 1, size = 3.5) +
-  scale_y_continuous(labels=scales::comma,
-                     expand=expansion(mult=c(.05,.2))) + labs(title="Daily Wikipedia views for Mars", x="date", y="views per day")
+```{r}
+
+START_DATE <- as.Date("2015-01-01")
+plot_spikes <- function(views_df, spikes_df, planet){
+  ggplot(views_df,aes(x=date,y=views)) +
+    geom_line(color="purple",linewidth=.4)+
+    geom_point(data=spikes_df,aes(x=date,y=views),color="blue",size=3)+
+    geom_text(data = spikes_df,
+              aes(x=date,y=views,label=str_wrap(label,width=30)),
+              hjust=-.1,vjust=1,size=3.5) +
+    scale_y_continuous(labels=scales::comma,
+                       expand=expansion(mult=c(.05,.2)))+
+    labs(title=paste("Daily Wikipedia views for", planet),
+         x="date",y="views per day")
+}
 
 
-spikes
 ```
 
+```{r}
+mars <- read_csv("mars_daily_views.csv")|> mutate(date=as.Date(date)) |>
+  filter(date >= START_DATE)
 
 
+mars_spikes <- read.csv("mars_spikes.csv") |> 
+  mutate(across(c(date,start,end), as.Date),
+    label=case_when(
+    date == as.Date("2015-09-29") ~ "Signs were found that water once flowed on Mars",
+    date == as.Date("2021-02-26") ~ "NASA's Preserverance Rover lands and spends its' first days on Mars"
+  ))
+
+plot_spikes(mars,mars_spikes,"Mars")
+
+```
+```{r}
+venus <- read_csv("venus_daily_views.csv") |>
+  mutate(date=as.Date(date)) |>
+  filter(date >= START_DATE)
+
+
+venus_spikes <- read_csv("venus_spikes.csv") |>
+  mutate(across(c(date,start,end),as.Date),
+         label="Scientists find phosphine in Venus' atmosphere, which is a potential sign of life + was involved in multiple different astronomical viewing events")
+
+plot_spikes(venus,venus_spikes, "Venus")
+
+```
 
 
 
